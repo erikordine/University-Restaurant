@@ -19,7 +19,7 @@ import {
 
 // =================================================================
 // ╔═════════════════════════════════════════════════════════════╗
-// ║ 1. CONSTANTES E DADOS INICIAIS                              ║
+// ║ 1. CONSTANTES E DADOS INICIAIS                            ║
 // ╚═════════════════════════════════════════════════════════════╝
 
 // --- Constantes ---
@@ -120,14 +120,7 @@ function PageHeader({ title, onBack }) {
     );
 }
 
-// Localize a função InputComIcon (linha 476 no seu último código)
 function InputComIcon({ icon, placeholder, type = "default", value, onChange }) {
-    // Determina o tipo de teclado (keyboardType)
-    const keyboardType = type === 'number' ? 'numeric' : 'default';
-    // CORREÇÃO APLICADA: 'none' para email ou password, 'sentences' para outros
-    const autoCapitalize = type === 'email' || type === 'password' ? 'none' : 'sentences';
-    const secureTextEntry = type === 'password';
-
     return (
         <View style={styles.inputContainer}>
             <View style={styles.inputIcon}>
@@ -138,9 +131,8 @@ function InputComIcon({ icon, placeholder, type = "default", value, onChange }) 
                 placeholder={placeholder}
                 value={value}
                 onChangeText={onChange}
-                secureTextEntry={secureTextEntry}
-                keyboardType={keyboardType}
-                autoCapitalize={autoCapitalize} // <-- Corrigido aqui
+                secureTextEntry={type === 'password'}
+                keyboardType={type === 'number' ? 'numeric' : 'default'}
                 placeholderTextColor="#9ca3af"
             />
         </View>
@@ -192,19 +184,19 @@ function MenuItemCard({ item, onRate, userHasRated, isAdmin = false }) {
                 <Text style={styles.menuItemKcal}>{item?.kcal || 0} kcal</Text>
             </View>
             <Text style={styles.menuItemDetails}>{item?.prato || 'Carregando...'}</Text>
-           
+            
             <View style={styles.menuItemFooter}>
                  <Text style={[styles.menuItemTag, classes.tag]}>{item?.tipo || '...'}</Text>
                  <View style={styles.menuItemRating}>
-                     <Star size={16} color="#eab308" fill="#eab308" />
-                     <Text style={styles.menuItemRatingText}> {mediaFormatada} {votacaoInfo}</Text>
+                      <Star size={16} color="#eab308" fill="#eab308" />
+                      <Text style={styles.menuItemRatingText}> {mediaFormatada} {votacaoInfo}</Text>
                  </View>
             </View>
 
             {/* --- MODIFICAÇÃO: Botão só aparece se NÃO for admin --- */}
             {!isAdmin && (
-                <TouchableOpacity
-                    onPress={() => onRate(item)}
+                <TouchableOpacity 
+                    onPress={() => onRate(item)} 
                     style={[styles.rateButton, userHasRated && styles.rateButtonDisabled]}
                     disabled={userHasRated}
                 >
@@ -322,10 +314,10 @@ function RatingModal({ isOpen, onClose, onRate, item }) {
                 <View style={styles.starContainer}>
                     {[1, 2, 3, 4, 5].map((star) => (
                         <TouchableOpacity key={star} onPress={() => handleRating(star)}>
-                            <Star
-                                size={40}
-                                color="#eab308"
-                                fill={star <= rating ? '#eab308' : 'none'}
+                            <Star 
+                                size={40} 
+                                color="#eab308" 
+                                fill={star <= rating ? '#eab308' : 'none'} 
                                 style={styles.starIcon}
                             />
                         </TouchableOpacity>
@@ -342,7 +334,7 @@ function RatingModal({ isOpen, onClose, onRate, item }) {
 
 // =================================================================
 // ╔═════════════════════════════════════════════════════════════╗
-// ║ 3. TELAS (SCREENS)                                          ║
+// ║ 3. TELAS (SCREENS)                                        ║
 // ╚═════════════════════════════════════════════════════════════╝
 
 function LoginScreen({ navigate, onLogin, showModal }) {
@@ -360,7 +352,7 @@ function LoginScreen({ navigate, onLogin, showModal }) {
                 <Text style={styles.loginTitle}>RU Digital</Text>
                 <Text style={styles.loginSubtitle}>Acesse sua conta para agendamentos e saldo.</Text>
                 <View style={styles.loginFormGroup}>
-                    <InputComIcon icon={<Mail />} placeholder="E-mail Institucional" type="email" value={email} onChange={setEmail} />
+                    <InputComIcon icon={<Mail />} placeholder="E-mail Institucional" value={email} onChange={setEmail} />
                     <InputComIcon icon={<Lock />} placeholder="Senha" type="password" value={password} onChange={setPassword} />
                 </View>
                 <TouchableOpacity onPress={handleSubmit} style={styles.mainButton}>
@@ -426,7 +418,7 @@ function SignupScreen({ navigate, onSignup, showModal }) {
 // --- MODIFICADO: HomeScreen ---
 function HomeScreen({ navigate, user, pratoDoDia }) { // <--- 1. Recebe pratoDoDia
     if (!user) return <LoadingScreen />;
-   
+    
     // AGORA ESTE VALOR É DINÂMICO!
     const userRating = user.avaliacaoMedia ? user.avaliacaoMedia.toFixed(1) : '—';
 
@@ -467,17 +459,17 @@ function HomeScreen({ navigate, user, pratoDoDia }) { // <--- 1. Recebe pratoDoD
                 </View>
 
                 {/* --- 3. Bloco "Ocupação" substituído por "Prato do Dia" --- */}
-                <View style={styles.homeActionsContainer}>
+                <View style={styles.homeActionsContainer}> 
                     <Text style={styles.homeSectionTitle}>Prato do Dia</Text>
                     {pratoDoDia ? ( // <--- 3. Usa a prop
                         <MenuItemCard
                             item={pratoDoDia}
-                            onRate={() => navigate('MENU')}
+                            onRate={() => navigate('MENU')} 
                             userHasRated={user.refeicoesAvaliadas?.some(r => r.id === pratoDoDia.id)}
-                            isAdmin={user.isAdmin}
+                            isAdmin={user.isAdmin} 
                         />
                     ) : (
-                        <View style={styles.homeChartCard}>
+                        <View style={styles.homeChartCard}> 
                             <Text style={styles.menuListEmpty}>Carregando cardápio...</Text>
                         </View>
                     )}
@@ -496,14 +488,14 @@ function MenuScreen({ navigate, menuItems, user, onRateMeal }) {
     const [ratingModal, setRatingModal] = useState({ isOpen: false, item: null });
 
     if (!user) return <LoadingScreen/>;
-   
+    
     // --- MODIFICADO: Checagem com .some() ---
     const hasRated = (itemId) => user.refeicoesAvaliadas?.some(r => r.id === itemId);
 
     return (
         <View style={styles.menuScreen}>
             {ratingModal.isOpen && (
-                <RatingModal
+                <RatingModal 
                     isOpen={ratingModal.isOpen}
                     onClose={() => setRatingModal({ isOpen: false, item: null })}
                     onRate={onRateMeal}
@@ -516,9 +508,9 @@ function MenuScreen({ navigate, menuItems, user, onRateMeal }) {
                 <View style={styles.menuList}>
                     {menuItems.length > 0 ? (
                         menuItems.map((item) => (
-                            <MenuItemCard
-                                key={item.id}
-                                item={item}
+                            <MenuItemCard 
+                                key={item.id} 
+                                item={item} 
                                 userHasRated={hasRated(item.id)}
                                 onRate={() => setRatingModal({ isOpen: true, item: item })}
                                 isAdmin={user.isAdmin} // <--- Passa prop de admin
@@ -537,21 +529,21 @@ function ScheduleScreen({ navigate, showModal, user, onScheduleSuccess }) {
     const [selectedMeal, setSelectedMeal] = useState(null); const [dayOffset, setDayOffset] = useState(0); const [showConfirmModal, setShowConfirmModal] = useState(false);
     if (!user) return <LoadingScreen />;
     const getDate = (offset) => { const date = new Date(); date.setDate(date.getDate() + offset); return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }); }; const getWeekday = (offset) => { const date = new Date(); date.setDate(date.getDate() + offset); const weekday = date.toLocaleDateString('pt-BR', { weekday: 'long' }); return weekday.charAt(0).toUpperCase() + weekday.slice(1); };
-    const handleSchedule = () => { if (!selectedMeal) { showModal("Selecione refeição."); return; } if (user.saldo < SCHEDULE_COST) { showModal("Saldo insuficiente."); return; } setShowConfirmModal(true); };
-   
+    const handleSchedule = () => { if (!selectedMeal) { showModal("Selecione refeição."); return; } if (user.saldo < SCHEDULE_COST) { showModal("Saldo insuficiente."); return; } setShowConfirmModal(true); }; 
+    
     // --- MODIFICADO ---
-    const confirmAndPay = () => {
+    const confirmAndPay = () => { 
         // Cria a mensagem para a notificação
         const diaAgendado = `${getWeekday(dayOffset)}, ${getDate(dayOffset)}`;
         const refeicaoAgendada = selectedMeal === 'almoco' ? 'Almoço' : 'Jantar';
         const message = `Agendado: ${refeicaoAgendada} em ${diaAgendado}`;
-       
+        
         // Envia o custo E a mensagem para o handler
-        onScheduleSuccess(SCHEDULE_COST, message);
-       
-        setShowConfirmModal(false);
-        showModal(`Agendado! Custo: R$ ${SCHEDULE_COST.toFixed(2).replace('.',',')}`);
-        setTimeout(() => navigate('HOME'), 1500);
+        onScheduleSuccess(SCHEDULE_COST, message); 
+        
+        setShowConfirmModal(false); 
+        showModal(`Agendado! Custo: R$ ${SCHEDULE_COST.toFixed(2).replace('.',',')}`); 
+        setTimeout(() => navigate('HOME'), 1500); 
     };
     // --- FIM DA MODIFICAÇÃO ---
 
@@ -581,7 +573,7 @@ function ScheduleScreen({ navigate, showModal, user, onScheduleSuccess }) {
 // *** TELA: RECARGA PIX (RECHARGE PIX SCREEN) ***
 function RechargePixScreen({ navigate, showModal, onRecharge }) {
     const [amount, setAmount] = useState('');
-   
+    
     const handleConfirm = () => {
         const parsedAmount = parseFloat(amount.replace(',', '.'));
         if (isNaN(parsedAmount) || parsedAmount <= 0) { showModal("Valor inválido."); return; }
@@ -601,7 +593,7 @@ function RechargePixScreen({ navigate, showModal, onRecharge }) {
                     <QrCode size={128} color="#2563eb" />
                 </View>
                 <Text style={styles.rechargeInstructions}>Escaneie o QR Code acima e insira o valor da recarga.</Text>
-               
+                
                 {/* Chave PIX e Botão Copiar */}
                 <View style={styles.pixKeyContainer}>
                     <Text style={styles.pixKeyLabel}>Chave Copia e Cola:</Text>
@@ -610,7 +602,7 @@ function RechargePixScreen({ navigate, showModal, onRecharge }) {
                         <Text style={styles.copyPixButtonText}>COPIAR CHAVE PIX</Text>
                     </TouchableOpacity>
                 </View>
-               
+                
                 <View style={styles.rechargeInputContainer}>
                     <InputComIcon icon={<CircleDollarSign />} placeholder="Valor (ex: 50,00)" type="numeric" value={amount} onChange={setAmount} />
                 </View>
@@ -660,7 +652,7 @@ function PersonalDataScreen({ navigate, user }) {
         <View style={styles.profileScreen}>
             <PageHeader title="Dados Pessoais" onBack={() => navigate('PROFILE')} />
             <ScrollView contentContainerStyle={styles.profileDataContent}>
-               
+                
                 {/* Informações de Visualização */}
                 <View style={styles.dataCard}>
                     <Text style={styles.dataLabel}>Nome Completo</Text>
@@ -703,7 +695,7 @@ function SecurityScreen({ navigate, onChangePassword, showModal }) {
         if (newPassword.length < 3) {
             return showModal("A nova senha deve ter pelo menos 3 caracteres.");
         }
-       
+        
         onChangePassword(currentPassword, newPassword);
         setCurrentPassword('');
         setNewPassword('');
@@ -715,11 +707,11 @@ function SecurityScreen({ navigate, onChangePassword, showModal }) {
         <View style={styles.profileScreen}>
             <PageHeader title="Segurança" onBack={() => navigate('PROFILE')} />
             <ScrollView contentContainerStyle={styles.profileDataContent}>
-               
+                
                 {/* Seção de Troca de Senha (MOVIDA PARA CÁ) */}
                 <View style={styles.passwordCard}>
                     <Text style={styles.passwordTitle}>Segurança e Senha</Text>
-                   
+                    
                     {!showEdit ? (
                         <TouchableOpacity onPress={() => setShowEdit(true)} style={styles.passwordButton}>
                             <Text style={styles.passwordButtonText}>Alterar Senha</Text>
@@ -729,7 +721,7 @@ function SecurityScreen({ navigate, onChangePassword, showModal }) {
                             <InputComIcon icon={<Lock />} placeholder="Senha Atual" type="password" value={currentPassword} onChange={setCurrentPassword} />
                             <InputComIcon icon={<Lock />} placeholder="Nova Senha" type="password" value={newPassword} onChange={setNewPassword} />
                             <InputComIcon icon={<Lock />} placeholder="Confirmar Nova Senha" type="password" value={confirmPassword} onChange={setConfirmPassword} />
-                           
+                            
                             <TouchableOpacity onPress={handleSavePassword} style={[styles.mainButton, styles.mainButtonSmall]}>
                                 <Text style={styles.mainButtonText}>Salvar Nova Senha</Text>
                             </TouchableOpacity>
@@ -782,8 +774,8 @@ function NotificationsScreen({ navigate, user, onCancelSchedule }) {
                             </View>
                             <View style={styles.notificationAction}>
                                 {notif.type === 'agendamento' && notif.status === 'ativo' && (
-                                    <TouchableOpacity
-                                        style={styles.cancelScheduleButton}
+                                    <TouchableOpacity 
+                                        style={styles.cancelScheduleButton} 
                                         onPress={() => onCancelSchedule(notif.id)}
                                     >
                                         <Ban size={16} color="#dc2626" />
@@ -807,7 +799,7 @@ function ProfileScreen({ navigate, user, onLogout }) {
     const profileItems = [
         { icon: <User color="#2563eb" />, label: "Dados Pessoais", screen: 'PERSONAL_DATA' },
         { icon: <Shield color="#16a34a" />, label: "Segurança", screen: 'SECURITY' },
-        { icon: <Bell color="#eab308" />, label: "Notificações", screen: 'NOTIFICATIONS' },
+        { icon: <Bell color="#eab308" />, label: "Notificações", screen: 'NOTIFICATIONS' }, 
         { icon: <HelpCircle color="#6b7280" />, label: "Ajuda", screen: 'HELP' },
     ];
     return (
@@ -824,8 +816,8 @@ function ProfileScreen({ navigate, user, onLogout }) {
                 </View>
                 <View style={styles.profileMenu}>
                     {profileItems.map(item => (
-                        <TouchableOpacity
-                            key={item.label}
+                        <TouchableOpacity 
+                            key={item.label} 
                             style={styles.profileMenuItem}
                             onPress={() => navigate(item.screen || 'PROFILE')}
                         >
@@ -848,16 +840,18 @@ function ProfileScreen({ navigate, user, onLogout }) {
 }
 
 // --- MODIFICADO: AdminDashboardScreen ---
-function AdminDashboardScreen({ navigate, menuItems, pratoDoDia }) { 
+function AdminDashboardScreen({ navigate, menuItems, pratoDoDia }) { // <--- 1. Recebe pratoDoDia
     const stats = [
         { icon: <Users color="#2563eb" />, label: "Ativos", value: "1.2k" },
         { icon: <Utensils color="#16a34a" />, label: "Refeições Hoje", value: "850" },
         { icon: <CircleDollarSign color="#9333ea" />, label: "Receita (Dia)", value: "R$ 4.2k" },
     ];
     
+    // --- 2. Lógica de cálculo REMOVIDA ---
+    // (useState e useEffect para pratoDoDia foram removidos)
+
     return (
         <View style={styles.adminScreen}>
-            {/* PageHeader lida com o paddingTop necessário */}
             <PageHeader title="Admin Dashboard" onBack={() => navigate('PROFILE')} />
             <ScrollView contentContainerStyle={styles.adminContent}>
                 <View>
@@ -873,39 +867,43 @@ function AdminDashboardScreen({ navigate, menuItems, pratoDoDia }) {
                     </View>
                 </View>
                 
-                {/* Ações Administrativas */}
+                {/* --- 3. Bloco de Ações (com botões de Relatório) --- */}
                 <View style={styles.adminActionsCard}>
                     <Text style={styles.adminActionsTitle}>Ações</Text>
                     <View style={styles.adminActionsList}>
-                        <TouchableOpacity style={[styles.adminActionButton, styles.adminButtonYellow]} onPress={() => navigate('ADMIN_USER_MANAGEMENT')}><Users size={16} color="#ca8a04" /><Text style={{ color:       '#ca8a04', fontWeight: '600' }}> Gestão de Usuários</Text></TouchableOpacity>
+                        <TouchableOpacity style={[styles.adminActionButton, styles.adminButtonYellow]} onPress={() => navigate('ADMIN_USER_MANAGEMENT')}><Users size={16} color="#ca8a04" /><Text style={{ color: '#ca8a04', fontWeight: '600' }}> Gestão de Usuários</Text></TouchableOpacity>
                         <TouchableOpacity style={[styles.adminActionButton, styles.adminButtonGreen]} onPress={() => navigate('ADMIN_ANNOUNCE')}><Send size={16} color="#16a34a" /><Text style={{ color: '#16a34a', fontWeight: '600' }}> Enviar Anúncio</Text></TouchableOpacity>
                         <TouchableOpacity style={[styles.adminActionButton, styles.adminButtonBlue]} onPress={() => navigate('ADMIN_RATINGS_REPORT')}><BarChart3 size={16} color="#1d4ed8" /><Text style={{ color: '#1d4ed8', fontWeight: '600' }}> Relatório de Avaliações</Text></TouchableOpacity>
                     </View>
                 </View>
 
-                {/* Bloco do Prato do Dia */}
-                <View>
+                {/* --- 4. Bloco do Prato do Dia --- */}
+                <View> 
                     <Text style={styles.adminSectionTitle}>Prato do Dia</Text>
-                    {pratoDoDia ? ( 
+                    {pratoDoDia ? ( // <--- 4. Usa a prop
                         <MenuItemCard
                             item={pratoDoDia}
-                            onRate={() => {}} 
-                            userHasRated={true} 
+                            onRate={() => {}} // Admin não avalia
+                            userHasRated={true} // Esconde o botão
                             isAdmin={true}
                         />
                     ) : (
-                        <View style={styles.adminChartCard}>
+                        <View style={styles.adminChartCard}> 
                             <Text style={styles.menuListEmpty}>Carregando cardápio...</Text>
                         </View>
                     )}
                 </View>
-                
+                {/* --- FIM DO BLOCO --- */}
             </ScrollView>
         </View>
     );
 }
 // --- FIM DA MODIFICAÇÃO ---
 
+// =================================================================
+// ╔═════════════════════════════════════════════════════════════╗
+// ║ ATUALIZAÇÃO: TELA DE EDIÇÃO DO ADMIN                        ║
+// ╚═════════════════════════════════════════════════════════════╝
 function AdminEditMenuScreen({ navigate, currentMenu, onSave }) {
     const [editedMenu, setEditedMenu] = useState(() => Array.isArray(currentMenu) ? [...currentMenu.map(item => ({...item}))] : []);
     useEffect(() => { if (Array.isArray(currentMenu)) { setEditedMenu([...currentMenu.map(item => ({...item}))]); } }, [currentMenu]);
@@ -930,7 +928,15 @@ function AdminEditMenuScreen({ navigate, currentMenu, onSave }) {
     return (
         <View style={styles.adminEditMenuScreen}>
             <PageHeader title="Editar Cardápio" onBack={() => navigate('ADMIN_DASHBOARD')} />
-            <ScrollView contentContainerStyle={styles.adminEditMenuContent}>
+            
+            {/* A View principal (adminEditMenuScreen) tem flex: 1.
+              Ao adicionar flex: 1 ao ScrollView, ele ocupa o espaço 
+              disponível ENTRE o PageHeader e o saveButtonContainer.
+            */}
+            <ScrollView 
+                style={{ flex: 1 }} // <--- CORREÇÃO 1
+                contentContainerStyle={styles.adminEditMenuContent}
+            >
                 {editedMenu.length > 0 ? editedMenu.map(item => (
                     <View key={item.id} style={styles.editMenuItemCard}>
                         <Text style={styles.editMenuItemDay}>{item.dia}</Text>
@@ -942,6 +948,8 @@ function AdminEditMenuScreen({ navigate, currentMenu, onSave }) {
                     </View>
                 )) : <Text style={styles.menuListEmpty}>Carregando...</Text>}
             </ScrollView>
+
+            {/* Este container agora ficará fixo na parte de baixo */}
             <View style={styles.saveButtonContainer}>
                 <TouchableOpacity onPress={handleSave} style={styles.mainButton} disabled={editedMenu.length === 0}>
                     <Save size={20} color="white" />
@@ -951,6 +959,11 @@ function AdminEditMenuScreen({ navigate, currentMenu, onSave }) {
         </View>
     );
 }
+// =================================================================
+// ╔═════════════════════════════════════════════════════════════╗
+// ║ FIM DA ATUALIZAÇÃO                                          ║
+// ╚═════════════════════════════════════════════════════════════╝
+
 
 // --- TELA DE GESTÃO DE USUÁRIOS (NOVA) ---
 function AdminUserManagementScreen({ navigate, users, onManualCredit, showModal }) {
@@ -959,7 +972,7 @@ function AdminUserManagementScreen({ navigate, users, onManualCredit, showModal 
     const [selectedUser, setSelectedUser] = useState(null);
     const [amount, setAmount] = useState('');
 
-    const filteredUsers = users.filter(user =>
+    const filteredUsers = users.filter(user => 
         !user.isAdmin && (
             user.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
             user.email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -993,7 +1006,7 @@ function AdminUserManagementScreen({ navigate, users, onManualCredit, showModal 
                     <View style={styles.modalContent}>
                         <Text style={styles.ratingModalTitle}>Ajustar Saldo</Text>
                         <Text style={styles.ratingModalSubtitle}>{selectedUser.nome}</Text>
-                        <InputComIcon
+                        <InputComIcon 
                             icon={<DollarSign />}
                             placeholder="Valor (ex: 10.00 ou -5.00)"
                             type="numeric"
@@ -1014,7 +1027,7 @@ function AdminUserManagementScreen({ navigate, users, onManualCredit, showModal 
 
             <PageHeader title="Gestão de Usuários" onBack={() => navigate('ADMIN_DASHBOARD')} />
             <View style={styles.userSearchContainer}>
-                <InputComIcon
+                <InputComIcon 
                     icon={<User />}
                     placeholder="Buscar por nome ou e-mail..."
                     value={searchTerm}
@@ -1062,7 +1075,7 @@ function AdminAnnounceScreen({ navigate, onSendAnnouncement, showModal }) {
             <ScrollView contentContainerStyle={styles.profileDataContent}>
                 <View style={styles.dataCard}>
                     <Text style={styles.dataLabel}>Mensagem do Anúncio</Text>
-                    <TextInput
+                    <TextInput 
                         style={styles.announceInput}
                         placeholder="Ex: O RU fechará mais cedo hoje..."
                         value={message}
@@ -1088,11 +1101,11 @@ function AdminRatingsReportScreen({ navigate, menuItems }) {
     useEffect(() => {
         if (menuItems && menuItems.length > 0) {
             const allRatedItems = menuItems.filter(item => item.numVotos > 0);
-           
+            
             const topRated = [...allRatedItems]
                 .sort((a, b) => b.avaliacaoMedia - a.avaliacaoMedia)
                 .slice(0, 5);
-               
+                
             const worstRated = [...allRatedItems]
                 .sort((a, b) => a.avaliacaoMedia - b.avaliacaoMedia)
                 .slice(0, 5);
@@ -1127,7 +1140,7 @@ function AdminRatingsReportScreen({ navigate, menuItems }) {
                         <Text style={styles.reportEmptyText}>Nenhum prato com votos suficientes.</Text>
                     )}
                 </View>
-               
+                
                 <View style={{ marginTop: 24 }}>
                     <Text style={styles.reportSectionTitle}>💔 Piores Avaliações</Text>
                     {worst5.length > 0 ? (
@@ -1144,7 +1157,7 @@ function AdminRatingsReportScreen({ navigate, menuItems }) {
 
 // =================================================================
 // ╔═════════════════════════════════════════════════════════════╗
-// ║ 4. COMPONENTE PRINCIPAL (APP)                               ║
+// ║ 4. COMPONENTE PRINCIPAL (APP)                             ║
 // ╚═════════════════════════════════════════════════════════════╝
 
 export default function App() {
@@ -1170,14 +1183,14 @@ export default function App() {
         let newActiveTab = activeTab;
         switch(screen) {
             case 'HOME': newActiveTab = 'Início'; break;
-           
+            
             // --- 2. Lógica de abas do Admin atualizada ---
             case 'ADMIN_DASHBOARD':
-            case 'ADMIN_USER_MANAGEMENT':
-            case 'ADMIN_ANNOUNCE':
-            case 'ADMIN_RATINGS_REPORT':
+            case 'ADMIN_USER_MANAGEMENT': 
+            case 'ADMIN_ANNOUNCE': 
+            case 'ADMIN_RATINGS_REPORT': 
                 newActiveTab = 'Dashboard'; break;
-            case 'ADMIN_EDIT_MENU':
+            case 'ADMIN_EDIT_MENU': 
                 newActiveTab = 'Editar'; break; // <-- Nova aba
 
             case 'MENU': newActiveTab = 'Cardápio'; break;
@@ -1194,8 +1207,8 @@ export default function App() {
         setUser(updatedUser); // Salva o usuário com a nova média
         const updatedUsersList = users.map(u => u.id === updatedUser.id ? updatedUser : u);
         setUsers(updatedUsersList);
-        if (Platform.OS === 'web') {
-            localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(updatedUsersList));
+        if (Platform.OS === 'web') { 
+            localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(updatedUsersList)); 
         }
     }, [users]);
     // --- FIM DA MODIFICAÇÃO ---
@@ -1212,18 +1225,18 @@ export default function App() {
 
     }, [user, showModalCallback, updateUserStateAndStorage]);
 
-    const handleUpdateMenu = useCallback((updatedMenuItems) => {
-        setMenuItems(updatedMenuItems);
+    const handleUpdateMenu = useCallback((updatedMenuItems) => { 
+        setMenuItems(updatedMenuItems); 
         if (Platform.OS === 'web') {
             localStorage.setItem(MENU_STORAGE_KEY, JSON.stringify(updatedMenuItems));
         }
-        showModalCallback("Cardápio atualizado!");
-        navigate('ADMIN_DASHBOARD');
+        showModalCallback("Cardápio atualizado!"); 
+        navigate('ADMIN_DASHBOARD'); 
     }, [showModalCallback, navigate]);
 
     // --- Função silenciosa para atualizar o menu sem navegar ---
     const updateMenuStateAndStorage = useCallback((updatedMenuItems) => {
-        setMenuItems(updatedMenuItems);
+        setMenuItems(updatedMenuItems); 
         if (Platform.OS === 'web') {
             localStorage.setItem(MENU_STORAGE_KEY, JSON.stringify(updatedMenuItems));
         }
@@ -1240,11 +1253,11 @@ export default function App() {
                 const newTotal = item.avaliacaoTotal + rating;
                 const newVotos = item.numVotos + 1;
                 const newMedia = newTotal / newVotos;
-                return {
-                    ...item,
-                    avaliacaoTotal: newTotal,
-                    numVotos: newVotos,
-                    avaliacaoMedia: newMedia
+                return { 
+                    ...item, 
+                    avaliacaoTotal: newTotal, 
+                    numVotos: newVotos, 
+                    avaliacaoMedia: newMedia 
                 };
             }
             return item;
@@ -1253,20 +1266,20 @@ export default function App() {
         // 3. Atualiza o Usuário e CALCULA A NOVA MÉDIA DO USUÁRIO
         const newRating = { id: itemId, rating: rating };
         const newRatingsArray = [...(user.refeicoesAvaliadas || []), newRating];
-       
+        
         const totalRatingSum = newRatingsArray.reduce((sum, item) => sum + item.rating, 0);
         const newOverallRating = totalRatingSum / newRatingsArray.length;
 
-        const updatedUser = {
-            ...user,
+        const updatedUser = { 
+            ...user, 
             refeicoesAvaliadas: newRatingsArray, // Salva o novo array de objetos
             avaliacaoMedia: newOverallRating // Salva a nova média calculada
         };
-       
+        
         // 4. Persistir e Atualizar Estados
         updateMenuStateAndStorage(updatedMenuItems);
         updateUserStateAndStorage(updatedUser); // Salva o usuário com a nova média
-       
+        
         showModalCallback(`Obrigado! Você deu ${rating} estrelas.`);
 
     }, [user, menuItems, updateMenuStateAndStorage, updateUserStateAndStorage, showModalCallback]);
@@ -1287,9 +1300,9 @@ export default function App() {
                 setPratoDoDia(loadedMenu[randomIndex]);
             }
             // --- FIM DA MODIFICAÇÃO ---
-           
+            
             navigate('LOGIN');
-           
+            
         } catch (error) {
             navigate('LOGIN');
             showModalCallback("Erro ao carregar dados.");
@@ -1307,26 +1320,26 @@ export default function App() {
     const handleSignup = useCallback((nome, email, ra, password) => {
         const emailExists = users.some(u => u.email.toLowerCase() === email.toLowerCase());
         if (emailExists) { showModalCallback('Este e-mail já está cadastrado.'); return; }
-       
-        const newUser = {
-            id: Date.now(),
-            nome,
-            email,
-            matricula: ra,
-            password,
-            curso: "Não definido",
-            saldo: 0,
-            refeicoesMes: 0,
-            agendamentos: 0,
-            avaliacaoMedia: 0,
-            refeicoesTotal: 0,
-            economizado: 0,
-            isAdmin: email.toLowerCase().includes('admin@'),
-            createdAt: new Date().toISOString(),
+        
+        const newUser = { 
+            id: Date.now(), 
+            nome, 
+            email, 
+            matricula: ra, 
+            password, 
+            curso: "Não definido", 
+            saldo: 0, 
+            refeicoesMes: 0, 
+            agendamentos: 0, 
+            avaliacaoMedia: 0, 
+            refeicoesTotal: 0, 
+            economizado: 0, 
+            isAdmin: email.toLowerCase().includes('admin@'), 
+            createdAt: new Date().toISOString(), 
             notifications: [],
             refeicoesAvaliadas: [] // <-- Garante que novos usuários tenham o array
         };
-       
+        
         const updatedUsers = [...users, newUser];
         setUsers(updatedUsers);
         setUser(newUser);
@@ -1335,27 +1348,27 @@ export default function App() {
     // --- FIM DA MODIFICAÇÃO ---
 
     const handleLogout = useCallback(() => { setUser(null); navigate('LOGIN'); setActiveTab('Início'); }, [navigate]);
-   
+    
     // --- MODIFICADO: handleNewSchedule ---
-    const handleNewSchedule = useCallback((cost, message) => {
-        if (!user) return showModalCallback("Erro.");
-        if (user.saldo < cost) { showModalCallback("Saldo insuficiente."); return; }
-       
-        const newNotification = {
-            id: Date.now(),
-            type: 'agendamento',
-            message: message,
-            cost: cost,
-            status: 'ativo'
+    const handleNewSchedule = useCallback((cost, message) => { 
+        if (!user) return showModalCallback("Erro."); 
+        if (user.saldo < cost) { showModalCallback("Saldo insuficiente."); return; } 
+        
+        const newNotification = { 
+            id: Date.now(), 
+            type: 'agendamento', 
+            message: message, 
+            cost: cost, 
+            status: 'ativo' 
         };
 
-        const updatedUser = {
-            ...user,
-            saldo: user.saldo - cost,
+        const updatedUser = { 
+            ...user, 
+            saldo: user.saldo - cost, 
             agendamentos: (user.agendamentos || 0) + 1,
             notifications: [...(user.notifications || []), newNotification] // Adiciona a notificação
-        };
-        updateUserStateAndStorage(updatedUser);
+        }; 
+        updateUserStateAndStorage(updatedUser); 
     }, [user, showModalCallback, updateUserStateAndStorage]);
     // --- FIM DA MODIFICAÇÃO ---
 
@@ -1367,9 +1380,9 @@ export default function App() {
         if (!notification || notification.status === 'cancelado') return;
 
         // Mapeia as notificações e atualiza a específica
-        const updatedNotifications = user.notifications.map(n =>
-            n.id === notificationId
-            ? { ...n, status: 'cancelado', message: `(Cancelado) ${n.message}` }
+        const updatedNotifications = user.notifications.map(n => 
+            n.id === notificationId 
+            ? { ...n, status: 'cancelado', message: `(Cancelado) ${n.message}` } 
             : n
         );
 
@@ -1410,8 +1423,8 @@ export default function App() {
         // Atualiza a lista de usuários
         const updatedUsersList = users.map(u => u.id === userId ? updatedUser : u);
         setUsers(updatedUsersList);
-        if (Platform.OS === 'web') {
-            localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(updatedUsersList));
+        if (Platform.OS === 'web') { 
+            localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(updatedUsersList)); 
         }
 
         showModalCallback("Saldo ajustado com sucesso!");
@@ -1428,8 +1441,8 @@ export default function App() {
         }));
 
         setUsers(newUsersList);
-        if (Platform.OS === 'web') {
-            localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(newUsersList));
+        if (Platform.OS === 'web') { 
+            localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(newUsersList)); 
         }
 
         // Atualiza o estado do usuário admin logado, se for o caso
@@ -1450,6 +1463,7 @@ export default function App() {
         if (!user) { if (currentScreen === 'SIGNUP') return <SignupScreen navigate={navigate} onSignup={handleSignup} showModal={showModalCallback} />; return <LoginScreen navigate={navigate} onLogin={handleLogin} showModal={showModalCallback} />; }
 
         switch (currentScreen) {
+            // --- 3. Passa a prop pratoDoDia para as telas ---
             case 'HOME': return <HomeScreen navigate={navigate} user={user} menuItems={menuItems} pratoDoDia={pratoDoDia} />;
             case 'MENU': return <MenuScreen navigate={navigate} menuItems={menuItems} user={user} onRateMeal={handleRateMeal} />;
             case 'SCHEDULE': return <ScheduleScreen navigate={navigate} showModal={showModalCallback} user={user} onScheduleSuccess={handleNewSchedule} />;
@@ -1458,11 +1472,11 @@ export default function App() {
             
             // --- ROTAS ATUALIZADAS ---
             case 'PERSONAL_DATA': return <PersonalDataScreen navigate={navigate} user={user} />;
-            case 'SECURITY': return <SecurityScreen navigate={navigate} onChangePassword={handleChangePassword} showModal={showModalCallback} />;
-            case 'NOTIFICATIONS': return <NotificationsScreen navigate={navigate} user={user} onCancelSchedule={handleCancelSchedule} />;
+            case 'SECURITY': return <SecurityScreen navigate={navigate} onChangePassword={handleChangePassword} showModal={showModalCallback} />; 
+            case 'NOTIFICATIONS': return <NotificationsScreen navigate={navigate} user={user} onCancelSchedule={handleCancelSchedule} />; 
             case 'PROFILE': return <ProfileScreen navigate={navigate} user={user} onLogout={handleLogout} />;
             
-            // --- ROTAS DE ADMIN ATUALIZADAS (Passando menuItems e pratoDoDia) ---
+            // --- ROTAS DE ADMIN ATUALIZADAS ---
             case 'ADMIN_DASHBOARD': return user.isAdmin ? <AdminDashboardScreen navigate={navigate} menuItems={menuItems} pratoDoDia={pratoDoDia} /> : <HomeScreen navigate={navigate} user={user} menuItems={menuItems} pratoDoDia={pratoDoDia}/>;
             case 'ADMIN_EDIT_MENU': return user.isAdmin ? <AdminEditMenuScreen navigate={navigate} currentMenu={menuItems} onSave={handleUpdateMenu} /> : <HomeScreen navigate={navigate} user={user} menuItems={menuItems} pratoDoDia={pratoDoDia}/>;
             case 'ADMIN_USER_MANAGEMENT': return user.isAdmin ? <AdminUserManagementScreen navigate={navigate} users={users} onManualCredit={handleManualCredit} showModal={showModalCallback} /> : <HomeScreen navigate={navigate} user={user} menuItems={menuItems} pratoDoDia={pratoDoDia}/>;
@@ -1473,8 +1487,20 @@ export default function App() {
         }
     };
 
+    // =================================================================
+    // ╔═════════════════════════════════════════════════════════════╗
+    // ║ ATUALIZAÇÃO: LÓGICA DO BOTTOMNAV                            ║
+    // ╚═════════════════════════════════════════════════════════════╝
+    
     // --- MODIFICADO: Lista de exclusão do BottomNav ---
-    const showBottomNav = !isLoading && user && !['LOGIN','SIGNUP','SCHEDULE','RECHARGE_PIX', 'PERSONAL_DATA', 'NOTIFICATIONS', 'SECURITY', 'ADMIN_USER_MANAGEMENT', 'ADMIN_ANNOUNCE', 'ADMIN_RATINGS_REPORT'].includes(currentScreen);
+    // Adicionado 'ADMIN_EDIT_MENU' para esconder a barra e mostrar o botão Salvar
+    const showBottomNav = !isLoading && user && !['LOGIN','SIGNUP','SCHEDULE','RECHARGE_PIX', 'PERSONAL_DATA', 'NOTIFICATIONS', 'SECURITY', 'ADMIN_USER_MANAGEMENT', 'ADMIN_ANNOUNCE', 'ADMIN_RATINGS_REPORT', 'ADMIN_EDIT_MENU'].includes(currentScreen);
+
+    // =================================================================
+    // ╔═════════════════════════════════════════════════════════════╗
+    // ║ FIM DA ATUALIZAÇÃO                                          ║
+    // ╚═════════════════════════════════════════════════════════════╝
+
 
     return (
         <View style={styles.fullAppContainer}>
@@ -1507,7 +1533,7 @@ export default function App() {
 
 // =================================================================
 // ╔═════════════════════════════════════════════════════════════╗
-// ║ 5. ESTILOS REACT NATIVE (StyleSheet)                        ║
+// ║ 5. ESTILOS REACT NATIVE (StyleSheet)                      ║
 // ╚═════════════════════════════════════════════════════════════╝
 
 const styles = StyleSheet.create({
@@ -1519,7 +1545,7 @@ const styles = StyleSheet.create({
     fullScreenContainer: {
         flex: 1,
         backgroundColor: 'white',
-        paddingTop: 0,
+        paddingTop: 0, 
     },
     screenContentScroll: {
         paddingBottom: 80, // Espaço para a BottomNav
@@ -1540,9 +1566,7 @@ const styles = StyleSheet.create({
     },
 
     // --- Header e Navegação ---
-    // Localize este estilo no seu const styles = StyleSheet.create({...})
     pageHeader: {
-        // ESTE É O PADDING QUE EMPURRA O TÍTULO PARA BAIXO (20 Android / 60 iOS)
         paddingTop: Platform.OS === 'android' ? 20 : 60, 
         flexDirection: 'row',
         alignItems: 'center',
@@ -1551,14 +1575,12 @@ const styles = StyleSheet.create({
         paddingBottom: 16,
         borderBottomWidth: 1,
         borderBottomColor: '#e5e7eb',
-        backgroundColor: 'white', // A cor branca agora cobre a Status Bar
+        backgroundColor: 'white',
     },
-    // Localize este estilo no seu const styles = StyleSheet.create({...})
     pageHeaderBackButton: {
         position: 'absolute',
         left: 16,
         padding: 8,
-        // CORREÇÃO: Usa o mesmo valor do paddingTop do header
         top: Platform.OS === 'android' ? 20 : 60, 
     },
     pageHeaderTitle: {
@@ -1578,7 +1600,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-around',
         alignItems: 'center',
-        paddingBottom: Platform.OS === 'ios' ? 15 : 0,
+        paddingBottom: Platform.OS === 'ios' ? 15 : 0, 
         zIndex: 10,
     },
     navItem: {
@@ -1589,6 +1611,9 @@ const styles = StyleSheet.create({
     },
     navItemActive: {
         color: '#2563eb',
+    },
+    navItemIconWrapper: {
+        // Wrapper para o ícone
     },
     navItemLabel: {
         fontSize: 12,
@@ -1812,7 +1837,7 @@ const styles = StyleSheet.create({
     },
     signupBackButton: {
         position: 'absolute',
-        top: Platform.OS === 'android' ? 20 : 60,
+        top: Platform.OS === 'android' ? 20 : 60, 
         left: 16,
         padding: 8,
         zIndex: 10,
@@ -1875,7 +1900,7 @@ const styles = StyleSheet.create({
     },
     homeHeader: {
         backgroundColor: '#2563eb',
-        paddingTop: Platform.OS === 'android' ? 20 : 60,
+        paddingTop: Platform.OS === 'android' ? 20 : 60, 
         paddingHorizontal: 24,
         paddingBottom: 24,
         borderBottomLeftRadius: 24,
@@ -1885,7 +1910,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 6,
         elevation: 5,
-        justifyContent: 'center',
+        justifyContent: 'center', 
     },
     homeHeaderContent: {
         // Wrapper para o conteúdo do header
@@ -1968,10 +1993,10 @@ const styles = StyleSheet.create({
     homeActionsGrid: {
         flexDirection: 'row',
         gap: 16,
-        marginBottom: 24,
+        // marginBottom: 24, // Removido
     },
     actionCard: {
-        flex: 1,
+        flex: 1, 
         backgroundColor: 'white',
         padding: 16,
         borderRadius: 16,
@@ -1998,7 +2023,10 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#6b7280',
     },
-
+    // --- Estilos antigos do Chart (agora usados como fallback) ---
+    homeChartContainer: {
+        padding: 24,
+    },
     homeChartCard: {
         backgroundColor: 'white',
         padding: 20,
@@ -2009,6 +2037,35 @@ const styles = StyleSheet.create({
         shadowRadius: 2,
         elevation: 2,
     },
+    homeChartHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 16,
+    },
+    homeChartTitle: {
+        fontSize: 18,
+        fontWeight: '700',
+    },
+    homeChartStatusTag: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#059669',
+        backgroundColor: '#d1fae5',
+        paddingHorizontal: 12,
+        paddingVertical: 4,
+        borderRadius: 9999,
+    },
+    homeChartSvgWrapper: {
+        height: 160,
+        backgroundColor: '#f3f4f6',
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#e5e7eb',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    // --- Fim dos estilos antigos do Chart ---
 
     // --- Menu Screen ---
     menuScreen: {
@@ -2237,7 +2294,7 @@ const styles = StyleSheet.create({
         color: '#dc2626',
         fontWeight: '600',
     },
-   
+    
     // --- Estilos de Notificações ---
     notificationsContent: {
         padding: 24,
@@ -2307,17 +2364,17 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         color: '#9ca3af',
     },
-   
+    
     // --- Admin Dashboard Screen ---
     adminScreen: { flex: 1, backgroundColor: '#f3f4f6', },
     adminContent: { padding: 24, gap: 24, flexGrow: 1, },
-    adminSectionTitle: { fontSize: 18, fontWeight: '600', color: '#374151', marginBottom: 16, paddingTop: Platform.OS === 'android' ? 20 : 60,},
+    adminSectionTitle: { fontSize: 18, fontWeight: '600', color: '#374151', marginBottom: 16, },
     adminStatsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 16, justifyContent: 'space-between', },
     adminStatCard: {
         backgroundColor: 'white',
         padding: 16,
         borderRadius: 16,
-        flex: 1,
+        flex: 1, 
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.05,
@@ -2339,14 +2396,16 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         padding: 20,
         borderRadius: 16,
-        flex: 1,
+        flex: 1, 
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.05,
         shadowRadius: 2,
         elevation: 2,
     },
-   
+    adminChartTitle: { fontWeight: '700', fontSize: 18, marginBottom: 16, },
+    adminChartSvgWrapper: { width: '100%', height: 100, backgroundColor: '#eff6ff', borderRadius: 8, justifyContent: 'center', alignItems: 'center', },
+    
     // --- Admin Edit Menu Screen ---
     adminEditMenuScreen: { flex: 1, backgroundColor: '#f3f4f6', },
     adminEditMenuContent: { padding: 24, gap: 24, paddingBottom: 90 },
@@ -2355,8 +2414,8 @@ const styles = StyleSheet.create({
     editMenuFormGroup: { gap: 12, },
     editMenuLabel: { fontWeight: '500', fontSize: 14, color: '#374151', marginBottom: 4, },
     editMenuInput: { width: '100%', paddingVertical: 8, paddingHorizontal: 12, backgroundColor: '#f9fafb', borderRadius: 8, borderWidth: 1, borderColor: '#d1d5db', fontSize: 16, },
-    saveButtonContainer: {
-        padding: 24,
+    saveButtonContainer: { 
+        padding: 24, 
         backgroundColor: '#f3f4f6', // Fundo para não ficar transparente
         borderTopWidth: 1,
         borderColor: '#e5e7eb',
@@ -2408,13 +2467,13 @@ const styles = StyleSheet.create({
 
     // --- Admin Announce Screen (NOVOS ESTILOS) ---
     announceInput: {
-        width: '100%',
-        paddingVertical: 12,
-        paddingHorizontal: 16,
-        backgroundColor: '#f9fafb',
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: '#d1d5db',
+        width: '100%', 
+        paddingVertical: 12, 
+        paddingHorizontal: 16, 
+        backgroundColor: '#f9fafb', 
+        borderRadius: 8, 
+        borderWidth: 1, 
+        borderColor: '#d1d5db', 
         fontSize: 16,
         textAlignVertical: 'top', // Para Android
         height: 150,
